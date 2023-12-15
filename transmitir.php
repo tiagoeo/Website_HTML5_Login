@@ -35,9 +35,31 @@
             }
 
             # REGISTRO
-            echo("Post efetuado com sucesso!");
+            echo("POST-Cadastro efetuado com sucesso!");
             exit();
 
+        }else if (isset($_POST['email']) and isset($_POST['senha'])){
+            $email = $_POST['email'];
+            $senha = $_POST['senha'];
+
+            # VALIDAÇÃO
+            if (empty($email)) {
+                echo("Email em branco.");
+                exit();
+            }
+            if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
+                echo("Email não é válido.");
+                exit();
+            }
+
+            if (empty($senha)) {
+                echo("Senha em branco.");
+                exit();
+            }
+            
+            # LOGIN
+            echo("POST-Login efetuado com sucesso!");
+            exit();
         }else{
             exit();
         }
