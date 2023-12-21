@@ -7,6 +7,7 @@
         if (isset($_POST['nome']) and isset($_POST['email']) and isset($_POST['senha1']) and isset($_POST['senha2'])){
             $nome = $_POST['nome'];
             $email = $_POST['email'];
+            $senha;
             $senha1 = $_POST['senha1'];
             $senha2 = $_POST['senha2'];
 
@@ -36,13 +37,34 @@
             if ($senha1 != $senha2){
                 echo("Senhas diferentes.");
                 exit();
+            }else{
+                $senha = sha1($senha1.'Website').md5($senha1.'JKBootstrap').sha1($senha1.'2024');
             }
 
             # REGISTRO
             try {
                 $conn = new PDO("mysql:host=$servername;dbname=websitedb", $username, $password);
                 $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                echo "Conectado ao Bando Mysql";
+
+                $cadastro = "INSERT INTO cadastro (nome, email, senha) VALUES (:param1, :param2, :param3);";
+                
+                $cadastro = $conn->prepare($cadastro);
+
+                $cadastro->bindValue("param1", $nome);
+                $cadastro->bindValue("param2", $email);
+                $cadastro->bindValue("param3", $senha);
+
+                $cadastro->execute();
+
+                if (isset($cadastro) and $cadastro != false){
+                    echo "Cadastro efetuado com sucesso!";
+                }else{    
+                    echo "Falha ao realizar o cadastro!";
+                }
+
+                $conn = null;
+                exit();
+                
             } catch(PDOException $e) {
                 echo "Falha na conexão: " . $e->getMessage();
             }
