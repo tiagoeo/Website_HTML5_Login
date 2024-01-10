@@ -72,7 +72,7 @@
 
         }else if (isset($_POST['email']) and isset($_POST['senha'])){
             $email = $_POST['email'];
-            $senha = $_POST['senha'];
+            $senha1 = $_POST['senha'];
 
             # VALIDAÇÃO
             if (empty($email)) {
@@ -84,16 +84,38 @@
                 exit();
             }
 
-            if (empty($senha)) {
+            if (empty($senha1)) {
                 echo("Senha em branco.");
                 exit();
             }
+
+            $senha = sha1($senha1.'Website').md5($senha1.'JKBootstrap').sha1($senha1.'2024');
             
             # LOGIN
             try {
                 $conn = new PDO("mysql:host=$servername;dbname=websitedb", $username, $password);
                 $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                echo "Conectado ao Bando Mysql";
+
+                $login = "SELECT cadastro.nome FROM cadastro WHERE email = :param1 && senha = :param2;";
+                
+                $login = $conn->prepare($login);
+
+                $login->bindValue("param1", $email);
+                $login->bindValue("param2", $senha);
+
+                $login->execute();
+
+                $result = $login->fetch();
+
+                if (isset($result) and $result != false){
+                    header('Content-Type: text/html; charset=utf-8');
+                    echo "Login efetuado com sucesso!, seja bem vindo <b>".mb_convert_case(($result['nome']), MB_CASE_TITLE, 'UTF-8');
+                }else{    
+                    echo "Falha ao realizar o login!";
+                }
+
+                $conn = null;
+                exit();
             } catch(PDOException $e) {
                 echo "Falha na conexão: " . $e->getMessage();
             }
